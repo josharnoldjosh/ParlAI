@@ -55,28 +55,35 @@ class Kvmemnn(nn.Module):
         xs_emb = self.encoder(xs)
 
         if len(mems) > 0 and self.hops > 0:
+            # if memories, do hops. only supports up to 2 it looks like.
             mem_enc = []
             for m in mems:
                 mem_enc.append(self.encoder(m))
             mem_enc.append(xs_emb)
             mems_enc = torch.cat(mem_enc)
             self.layer_mems = mems
+            # cosine similarity
             layer2 = self.cosine(xs_emb, mems_enc).unsqueeze(0)
             self.layer2 = layer2
+            # softmax activation
             layer3 = self.softmax(layer2)
             self.layer3 = layer3
+            # new embedding
             lhs_emb = torch.mm(layer3, mems_enc)
 
             if self.lins > 0:
+                # one linear
                 lhs_emb = self.lin1(lhs_emb)
             if self.hops > 1:
+                # do another hop
                 layer4 = self.cosine(lhs_emb, mems_enc).unsqueeze(0)
                 layer5 = self.softmax(layer4)
                 self.layer5 = layer5
                 lhs_emb = torch.mm(layer5, mems_enc)
                 if self.lins > 1:
+                    # do another linear
                     lhs_emb = self.lin2(lhs_emb)
-        else:
+        else:  # zero hops, check if doing one linear
             if self.lins > 0:
                 lhs_emb = self.lin1(xs_emb)
             else:
@@ -84,6 +91,7 @@ class Kvmemnn(nn.Module):
         if ys is not None:
             # training
             if self.cosineEmbedding:
+                # cosine embedding outputs the actual embeddings for cosine margin loss
                 ys_enc = []
                 xs_enc.append(lhs_emb)
                 ys_enc.append(self.encoder2(ys))
@@ -92,6 +100,7 @@ class Kvmemnn(nn.Module):
                     c_emb = self.encoder2(c)
                     ys_enc.append(c_emb)
             else:
+                # otherwise output directly the dot score
                 xs_enc.append(lhs_emb.dot(self.encoder2(ys)))
                 for c in cands:
                     c_emb = self.encoder2(c)
@@ -109,8 +118,10 @@ class Kvmemnn(nn.Module):
                     c_emb = self.encoder2(c)
                     xs_enc.append(lhs_emb.dot(c_emb))
         if self.cosineEmbedding:
+            # (query + hops representation) * N, N candidate representations
             return torch.cat(xs_enc), torch.cat(ys_enc)
         else:
+            # score per candidate
             return torch.cat(xs_enc)
 
 

@@ -148,7 +148,7 @@ class TorchRankerAgent(TorchAgent):
             else:
                 states = {}
 
-        self.rank_loss = nn.CrossEntropyLoss(reduce=True, size_average=False)
+        self.rank_loss = self.build_loss(opt)
         if self.use_cuda:
             self.model.cuda()
             self.rank_loss.cuda()
@@ -172,6 +172,9 @@ class TorchRankerAgent(TorchAgent):
             self.model = torch.nn.parallel.DistributedDataParallel(
                 self.model, device_ids=[self.opt['gpu']], broadcast_buffers=False
             )
+
+    def build_loss(self, opt):
+        return nn.CrossEntropyLoss(reduce=True, size_average=False)
 
     def set_interactive_mode(self, mode, shared=False):
         self.candidates = self.opt['candidates']
