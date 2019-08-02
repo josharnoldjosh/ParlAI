@@ -1,3 +1,11 @@
+## READ ME
+
+- **We are going to use the ParlAI/parlai/mturk/tasks/personachat/personachat_chat/ task**
+- **CD to that directory and run, `python3 run.py` (note you first must set up Parl.Ai by following instructions below. We will need an amazon mturk account)**
+- **The project uses websockets to pass data from worlds.py to the HTML & Back. Look at the `send_packet` function in the HTML code and how it works to send & receive data :)**
+
+
+
 <p align="center"><img width="70%" src="docs/source/\_static/img/parlai.png" /></p>
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/facebookresearch/ParlAI/blob/master/LICENSE) [![CircleCI](https://circleci.com/gh/facebookresearch/ParlAI.svg?style=shield)](https://circleci.com/gh/facebookresearch/ParlAI/tree/master) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/facebookresearch/ParlAI/blob/master/CONTRIBUTING.md)
